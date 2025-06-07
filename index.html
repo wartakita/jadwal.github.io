@@ -189,6 +189,8 @@
 <body>
 <h1>Poster Jadwal Pertandingan Football ⚽</h1>
 <form id="matchForm">
+  <label for="leagueTitle">Judul Liga Pertandingan</label>
+  <input type="text" id="leagueTitle" placeholder="Masukkan nama liga (contoh: Liga Indonesia)" required />
   <div id="matchContainer"></div>
   <button type="button" onclick="addMatch()">➕ Tambah Pertandingan</button>
   <button type="submit">🎨 Generate Poster</button>
@@ -234,6 +236,12 @@ addMatch();
 document.getElementById('matchForm').addEventListener('submit', e => {
   e.preventDefault();
   poster.innerHTML = '';
+  const leagueTitleInput = document.getElementById('leagueTitle');
+  const header = document.createElement('h2');
+  header.textContent = leagueTitleInput.value || 'JADWAL LIGA PERTANDINGAN';
+  header.style.color = '#00f0ff';
+  header.style.marginBottom = '20px';
+  poster.appendChild(header);
   let matches = [];
   for (let i = 0; i < matchCount; i++) {
     const leagueLogo = document.querySelector(`[name='leagueLogo${i}']`)?.value;
