@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Poster Jadwal Pertandingan Football</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
+<style>
+  body {
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(circle at center, #0a0f2c, #000);
+    color: #fff;
+    margin: 0;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #00f0ff;
+    margin-bottom: 1.5rem;
+  }
+  form {
+    background: #151a33;
+    padding: 20px;
+    border-radius: 16px;
+    border: 2px solid #00f0ff;
+    max-width: 800px;
+    margin: auto;
+  }
+  .match-set {
+    border: 1px solid #444;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  label {
+    color: #ff0057;
+    font-weight: bold;
+    display: block;
+    margin-top: 10px;
+  }
+  input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 4px;
+    background: #0a0f2c;
+    border: 1px solid #00f0ff;
+    color: #fff;
+    border-radius: 8px;
+  }
+  .poster {
+    margin-top: 40px;
+    padding: 20px;
+    background: #1b223c;
+    border-radius: 12px;
+    max-width: 800px;
+    margin-inline: auto;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.2);
+  }
+  .poster img.league-logo {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid #00f0ff;
+    margin-bottom: 16px;
+  }
+  .match-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: #2c3655;
+    padding: 16px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .team {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px;
+  }
+  .team img {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    border: 2px solid #00f0ff;
+    background: #fff;
+  }
+  .team span {
+    margin-top: 8px;
+    font-size: 1.1rem;
+  }
+  .time, .tv {
+    color: #00f0ff;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 10px;
+  }
+  #downloadBtn {
+    margin-top: 20px;
+    background: linear-gradient(135deg, #ff0057, #00f0ff);
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 12px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+  }
+</style>
+</head>
+<body>
+<h1>Poster Jadwal Pertandingan Football ⚽</h1>
+<form id="matchForm">
+  <div id="matchContainer"></div>
+  <button type="button" onclick="addMatch()">➕ Tambah Pertandingan</button>
+  <button type="submit">🎨 Generate Poster</button>
+</form>
+<div class="poster" id="posterPreview"></div>
+<div id="downloadNotice" style="display:none;text-align:center;margin-top:10px;color:#00f0ff;font-weight:bold;">Poster siap diunduh!</div>
+<div style="text-align:center">
+  <button id="downloadBtn" style="display:none">Download Poster</button>
+</div>
+<script>
+function removeMatch(button) {
+  const block = button.closest('.match-set');
+  matchContainer.removeChild(block);
+}
+let matchCount = 0;
+const matchContainer = document.getElementById('matchContainer');
+const poster = document.getElementById('posterPreview');
+const downloadBtn = document.getElementById('downloadBtn');
+const downloadNotice = document.getElementById('downloadNotice');
+
+function addMatch() {
+  const idx = matchCount++;
+  const div = document.createElement('div');
+  div.className = 'match-set';
+  div.setAttribute('data-index', idx);
+  div.innerHTML = `
+    <label>Logo Liga</label><input type="url" name="leagueLogo${idx}" required />
+    <label>Logo Tim 1</label><input type="url" name="team1Logo${idx}" required />
+    <label>Nama Tim 1</label><input type="text" name="team1Name${idx}" required />
+    <label>Waktu</label><input type="time" name="matchTime${idx}" required />
+    <label>Logo Tim 2</label><input type="url" name="team2Logo${idx}" required />
+    <label>Nama Tim 2</label><input type="text" name="team2Name${idx}" required />
+    <label>Stasiun TV</label><input type="text" name="tvStation${idx}" required />
+    <label>Tanggal</label>
+    <input type="date" name="matchDate${idx}" required />
+    <button type="button" onclick="removeMatch(this)" style="margin-top:10px;color:#fff;background:#ff0057;border:none;padding:8px 12px;border-radius:6px;cursor:pointer;">❌ Hapus Pertandingan</button>
+  `;
+  matchContainer.appendChild(div);
+}
+
+addMatch();
+
+document.getElementById('matchForm').addEventListener('submit', e => {
+  e.preventDefault();
+  poster.innerHTML = '';
+  let matches = [];
+  for (let i = 0; i < matchCount; i++) {
+    const leagueLogo = document.querySelector(`[name='leagueLogo${i}']`)?.value;
+    const team1Logo = document.querySelector(`[name='team1Logo${i}']`)?.value;
+    const team1Name = document.querySelector(`[name='team1Name${i}']`)?.value;
+    const matchTime = document.querySelector(`[name='matchTime${i}']`)?.value;
+    const team2Logo = document.querySelector(`[name='team2Logo${i}']`)?.value;
+    const team2Name = document.querySelector(`[name='team2Name${i}']`)?.value;
+    const tvStation = document.querySelector(`[name='tvStation${i}']`)?.value;
+    const matchDate = document.querySelector(`[name='matchDate${i}']`)?.value;
+
+    if (!leagueLogo || !team1Logo || !team2Logo || !team1Name || !team2Name || !matchTime || !tvStation || !matchDate) continue;
+
+    matches.push({
+      leagueLogo,
+      team1Logo,
+      team1Name,
+      matchTime,
+      team2Logo,
+      team2Name,
+      tvStation,
+      matchDate: new Date(matchDate)
+    });
+  }
+  const info = document.createElement('div');
+  info.style.textAlign = 'right';
+  info.style.fontSize = '0.9rem';
+  info.style.color = '#aaa';
+  info.style.marginBottom = '10px';
+  info.textContent = '*Waktu dalam WIB';
+  poster.appendChild(info);
+  matches.sort((a, b) => a.matchDate - b.matchDate);
+  matches.forEach(data => {
+    const days = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    const months = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+    const formattedDate = `${days[data.matchDate.getDay()]}, ${data.matchDate.getDate()} ${months[data.matchDate.getMonth()]} ${data.matchDate.getFullYear()}`;
+    const row = document.createElement('div');
+    row.className = 'match-row';
+    row.innerHTML = `
+      <img class="league-logo" src="${data.leagueLogo}" alt="Logo Liga" />
+      <div class="team"><img src="${data.team1Logo}" alt="Logo Tim 1" /><span>${data.team1Name}</span></div>
+      <div>
+        <div class="time">${data.matchTime}</div>
+        <div class="tv">Disiarkan di: ${data.tvStation}</div>
+        <div class="tv">${formattedDate}</div>
+      </div>
+      <div class="team"><img src="${data.team2Logo}" alt="Logo Tim 2" /><span>${data.team2Name}</span></div>
+    `;
+    poster.appendChild(row);
+  });
+  poster.style.display = 'block';
+  const watermark = document.createElement('div');
+  watermark.textContent = '© sportscope.id';
+  watermark.style.textAlign = 'center';
+  watermark.style.color = '#00f0ff';
+  watermark.style.textShadow = '0 0 8px rgba(0,240,255,0.6)';
+  watermark.style.marginTop = '20px';
+  watermark.style.fontSize = '0.9rem';
+  poster.appendChild(watermark);
+  downloadBtn.style.display = 'inline-block';
+  downloadNotice.style.display = 'block';
+});
+
+downloadBtn.addEventListener('click', () => {
+  setTimeout(() => {
+    html2canvas(poster, {
+      allowTaint: true,
+      useCORS: true,
+      backgroundColor: null,
+      scale: 2
+    }).then(canvas => {
+      canvas.toBlob(blob => {
+        const link = document.createElement('a');
+        link.download = `poster-jadwal-${Date.now()}.png`;
+        link.href = URL.createObjectURL(blob);
+        link.click();
+        URL.revokeObjectURL(link.href);
+        downloadBtn.style.display = 'none';
+      }, 'image/png');
+    });
+  }, 300);
+});
+</script>
+</body>
+</html>
